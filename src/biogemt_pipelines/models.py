@@ -15,6 +15,7 @@ class Pipeline:
     name: str
     display_name: str
     description: str
+    responsible: str
     keywords: tuple[str, ...]
     use_cases: tuple[str, ...]
     example_args: tuple[str, ...]

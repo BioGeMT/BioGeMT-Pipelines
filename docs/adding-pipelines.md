@@ -19,6 +19,7 @@ Create a file in `pipelines/` named after the pipeline:
 name: example_pipeline
 display_name: Example Pipeline
 description: Short human-readable summary of what the pipeline does.
+responsible: github-username
 keywords:
   - keyword one
   - keyword two

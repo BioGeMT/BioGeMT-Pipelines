@@ -50,6 +50,7 @@ def load_pipeline(path: Path) -> Pipeline:
         name=_required_string(loaded, "name", path),
         display_name=str(loaded.get("display_name", loaded["name"])).strip(),
         description=str(loaded.get("description", "")).strip(),
+        responsible=str(loaded.get("responsible", "")).strip(),
         keywords=_string_tuple(loaded.get("keywords", []), "keywords", path),
         use_cases=_string_tuple(loaded.get("use_cases", []), "use_cases", path),
         example_args=_string_tuple(loaded.get("example_args", ["--help"]), "example_args", path),

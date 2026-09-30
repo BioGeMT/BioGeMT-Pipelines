@@ -1,6 +1,7 @@
 name: genomic_region_annotator
 display_name: Genomic Region Annotator
 description: Annotates genomic regions and helps connect BED-like intervals to nearby genes and genomic context.
+responsible: zacharopoulou
 keywords:
   - genomic regions
   - BED

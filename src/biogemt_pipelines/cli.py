@@ -83,6 +83,8 @@ def main(argv: list[str] | None = None) -> int:
             print(f"display_name: {pipeline.display_name}")
             if pipeline.description:
                 print(f"description: {pipeline.description}")
+            if pipeline.responsible:
+                print(f"responsible: {pipeline.responsible}")
             if pipeline.keywords:
                 print(f"keywords: {', '.join(pipeline.keywords)}")
             if pipeline.use_cases:
