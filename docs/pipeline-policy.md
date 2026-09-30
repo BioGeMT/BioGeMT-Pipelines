@@ -35,7 +35,7 @@ Before a pipeline is added here, its source repository must have:
 Deployment commands must receive a release tag explicitly:
 
 ```bash
-make deploy RELEASE=v0.1.0
+make deploy PIPELINE=genomic_region_annotator RELEASE=v0.1.0
 ```
 
 Deploying directly from a moving branch is intentionally unsupported.

@@ -1,6 +1,6 @@
 # Deployment
 
-This document describes the initial server deployment flow for BioGeMT pipelines.
+This document describes the server deployment flow for BioGeMT pipelines.
 
 ## Server requirements
 
@@ -8,7 +8,7 @@ This document describes the initial server deployment flow for BioGeMT pipelines
 - Git
 - uv
 - Access to the BioGeMT GitHub organization repositories
-- Write access to `/srv/biogemt` or a custom `BIOGEMT_ROOT`
+- Write access to `/srv/biogemt` or a custom root in `config/server.yaml`
 
 ## Server layout
 
@@ -25,23 +25,19 @@ The default production layout is:
 └── logs/
 ```
 
-You can override this root for testing or non-standard deployments:
+## Server config
+
+For persistent server-specific settings, copy the example config:
 
 ```bash
-export BIOGEMT_ROOT=/path/to/biogemt
+cp config/server.example.yaml config/server.yaml
 ```
 
-For persistent server-specific settings, copy the example environment file:
-
-```bash
-cp config/server.env.example config/server.env
-```
-
-Then edit `config/server.env`. This file is ignored by Git.
+Then edit `config/server.yaml`. This file is ignored by Git.
 
 ## Initial setup
 
-Create the root directory and assign appropriate ownership or group permissions for the server users who will operate the pipelines.
+Create the root directory and assign appropriate ownership or group permissions for users who will operate the pipelines.
 
 ```bash
 sudo mkdir -p /srv/biogemt
@@ -52,54 +48,51 @@ sudo chmod -R g+rwx /srv/biogemt
 Install and activate a released Genomic Region Annotator version:
 
 ```bash
-make install RELEASE=v0.1.0
+make install PIPELINE=genomic_region_annotator RELEASE=v0.1.0
 ```
 
 This creates a release-specific checkout under `releases/` and points `current` to it.
 
 ## Verify installation
 
-Run the wrapper with the pipeline help command:
+Run the active release with the pipeline help command:
 
 ```bash
-make run ARGS='--help'
+make run PIPELINE=genomic_region_annotator ARGS='-- --help'
 ```
 
-## Update pipeline
+## Deploy pipeline release
 
-Production updates must use explicit release tags matching `vMAJOR.MINOR.PATCH`. Avoid deploying by pulling `main` directly.
+Production updates must use explicit release tags matching `vMAJOR.MINOR.PATCH`. Deploying moving branches is unsupported.
 
 ```bash
-make deploy RELEASE=v0.2.0
+make deploy PIPELINE=genomic_region_annotator RELEASE=v0.2.0
 ```
 
-The update script performs:
+The deploy command performs:
 
-1. Creates or reuses a release-specific checkout under `releases/`.
-2. `git fetch --tags`
-3. `git checkout <version>`
-4. `uv sync --frozen`
-5. `uv run pytest`
-6. Updates the `current` symlink only after setup and tests pass.
+1. Loads the pipeline definition from `pipelines/`.
+2. Validates that the release tag matches the pipeline release policy.
+3. Creates or reuses a release-specific checkout under `releases/`.
+4. Checks out the requested release tag.
+5. Runs `uv sync --frozen` inside the pipeline repository.
+6. Runs the pipeline test command.
+7. Updates the `current` symlink only after setup and tests pass.
 
 ## Rollback pipeline
 
-Rollback is the same operation with a previous known-good version:
+Rollback activates a previous installed release:
 
 ```bash
-make rollback RELEASE=v0.1.0
+make rollback PIPELINE=genomic_region_annotator RELEASE=v0.1.0
 ```
 
-For urgent manual rollback without `make`, activate the installed release directly:
-
-```bash
-./scripts/activate.sh v0.1.0
-```
+If the release is not installed yet, deploy or install it first.
 
 ## Notes
 
-- Source code remains in `BioGeMT/genomic_region_annotator`.
+- Source code remains in the pipeline's own repository.
 - Runtime data belongs under `/srv/biogemt/data`.
 - Pipeline run outputs belong under `/srv/biogemt/runs`.
 - Logs belong under `/srv/biogemt/logs`.
-- Server-specific configuration can be stored in `config/server.yaml`, which is intentionally ignored by Git.
+- Server-specific configuration belongs in `config/server.yaml`.

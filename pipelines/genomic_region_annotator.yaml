@@ -1,17 +1,9 @@
 name: genomic_region_annotator
-
 repository: https://github.com/BioGeMT/genomic_region_annotator.git
-
-install_dir: /srv/biogemt/pipelines/genomic_region_annotator
-
 runtime: uv
+command: genomic-region-annotator
+test_command: pytest
 
 release_policy:
   required: true
-  tag_pattern: vMAJOR.MINOR.PATCH
-
-command: genomic-region-annotator
-
-data_dir: /srv/biogemt/data
-
-runs_dir: /srv/biogemt/runs/genomic_region_annotator
+  tag_pattern: '^v[0-9]+\.[0-9]+\.[0-9]+$'

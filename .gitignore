@@ -1,6 +1,5 @@
 # Server-specific configuration
 config/server.yaml
-config/server.env
 
 # Local environments
 .venv/

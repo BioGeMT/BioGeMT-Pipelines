@@ -1,19 +1,42 @@
 # BioGeMT Pipelines
 
-Central repository for deploying, managing, and running BioGeMT research pipelines on shared infrastructure.
+Deployment controller for installing, updating, rolling back, and running BioGeMT research pipelines on shared infrastructure.
+
+This repository does not contain pipeline source code. Each pipeline remains in its own repository and is deployed here only through explicit releases.
 
 ## Current pipelines
 
-- Genomic Region Annotator
+- `genomic_region_annotator`
 
 ## Design principles
 
 - Pipeline source code remains in its own repository.
-- Each pipeline has an isolated software environment.
-- Production deployments use pinned versions.
 - Every integrated pipeline must publish versioned releases.
+- Production deployments use explicit release tags only.
+- Each release is installed in an isolated checkout.
+- The active release is selected through a `current` symlink.
 - Shared reference data is stored outside pipeline repositories.
 - Pipeline runs and results are stored separately from source code.
+
+## Repository layout
+
+```text
+BioGeMT-Pipelines/
+├── Makefile
+├── README.md
+├── pyproject.toml
+├── pipelines/
+│   └── genomic_region_annotator.yaml
+├── src/
+│   └── biogemt_pipelines/
+├── config/
+│   └── server.example.yaml
+├── docs/
+│   ├── adding-pipelines.md
+│   ├── deployment.md
+│   └── pipeline-policy.md
+└── .gitignore
+```
 
 ## Server layout
 
@@ -28,82 +51,68 @@ Central repository for deploying, managing, and running BioGeMT research pipelin
 └── logs/
 ```
 
-## Repository layout
+## CLI workflow
 
-```text
-BioGeMT-Pipelines/
-├── Makefile
-├── README.md
-├── pipelines/
-│   └── genomic_region_annotator.yaml
-├── scripts/
-│   ├── activate.sh
-│   ├── install.sh
-│   ├── update.sh
-│   └── run.sh
-├── config/
-│   ├── server.example.yaml
-│   └── server.env.example
-├── docs/
-│   ├── pipeline-policy.md
-│   └── deployment.md
-└── .gitignore
-```
+Use the Python CLI through `uv`. The `Makefile` is a convenience wrapper around the same CLI.
 
-## Genomic Region Annotator
-
-The Genomic Region Annotator source code lives in its own repository:
-
-```text
-https://github.com/BioGeMT/genomic_region_annotator.git
-```
-
-This repository only defines how the pipeline is installed, updated, and launched on shared infrastructure.
-
-## Release-based deployment
-
-Production deployments should use explicit released versions, tags, or pinned commits. Do not deploy production by implicitly tracking `main`.
-
-Integrated pipelines must publish release tags matching `vMAJOR.MINOR.PATCH`; see `docs/pipeline-policy.md`.
-
-Install and activate a released version on a server:
+List registered pipelines:
 
 ```bash
-make install RELEASE=v0.1.0
+make list
 ```
 
-Run the active release through the `current` symlink:
+Show deployment info:
 
 ```bash
-make run ARGS='--help'
+make info PIPELINE=genomic_region_annotator
 ```
 
-Activate another released version:
+Install and activate a release without tests:
 
 ```bash
-make deploy RELEASE=v0.2.0
+make install PIPELINE=genomic_region_annotator RELEASE=v0.1.0
 ```
 
-Rollback by re-activating a previous release:
+Deploy a release with tests:
 
 ```bash
-make rollback RELEASE=v0.1.0
+make deploy PIPELINE=genomic_region_annotator RELEASE=v0.2.0
 ```
 
-The underlying scripts are still available for automation:
+Rollback to an already installed release:
 
 ```bash
-./scripts/install.sh v0.1.0
-./scripts/update.sh v0.2.0
-./scripts/activate.sh v0.1.0
+make rollback PIPELINE=genomic_region_annotator RELEASE=v0.1.0
 ```
+
+Run the active release:
+
+```bash
+make run PIPELINE=genomic_region_annotator ARGS='-- --help'
+```
+
+Equivalent direct CLI calls:
+
+```bash
+uv run biogemt-pipelines deploy genomic_region_annotator --release v0.2.0
+uv run biogemt-pipelines rollback genomic_region_annotator --release v0.1.0
+uv run biogemt-pipelines run genomic_region_annotator -- --help
+```
+
+## Release rule
+
+Every pipeline must publish release tags matching `vMAJOR.MINOR.PATCH`, for example `v0.1.0`.
+
+Moving branches such as `main`, `dev`, or `latest` are not valid deployment targets.
+
+See `docs/pipeline-policy.md` for the full policy.
 
 ## Server-specific configuration
 
-Defaults target `/srv/biogemt`. For a specific server, copy the environment example and edit it locally:
+Defaults target `/srv/biogemt`. For a specific server, copy the example config and edit it locally:
 
 ```bash
-cp config/server.env.example config/server.env
+cp config/server.example.yaml config/server.yaml
 ```
 
-`config/server.env` is ignored by Git.
+`config/server.yaml` is ignored by Git.
