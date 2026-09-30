@@ -17,6 +17,7 @@ Create a file in `pipelines/` named after the pipeline:
 
 ```yaml
 name: example_pipeline
+description: Short human-readable summary of what the pipeline does.
 repository: https://github.com/BioGeMT/example_pipeline.git
 runtime: uv
 command: example-pipeline

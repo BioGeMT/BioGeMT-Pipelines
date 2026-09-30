@@ -13,6 +13,7 @@ class ReleasePolicy:
 @dataclass(frozen=True)
 class Pipeline:
     name: str
+    description: str
     repository: str
     runtime: str
     command: str

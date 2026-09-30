@@ -48,6 +48,7 @@ def load_pipeline(path: Path) -> Pipeline:
 
     return Pipeline(
         name=_required_string(loaded, "name", path),
+        description=str(loaded.get("description", "")).strip(),
         repository=_required_string(loaded, "repository", path),
         runtime=_required_string(loaded, "runtime", path),
         command=_required_string(loaded, "command", path),

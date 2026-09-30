@@ -1,4 +1,5 @@
 name: genomic_region_annotator
+description: Annotates genomic regions using BioGeMT reference data and command-line workflows.
 repository: https://github.com/BioGeMT/genomic_region_annotator.git
 runtime: uv
 command: genomic-region-annotator

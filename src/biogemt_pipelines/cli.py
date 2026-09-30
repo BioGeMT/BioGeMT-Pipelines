@@ -71,6 +71,8 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "info":
             paths = PipelinePaths.for_pipeline(server, pipeline)
             print(f"name: {pipeline.name}")
+            if pipeline.description:
+                print(f"description: {pipeline.description}")
             print(f"repository: {pipeline.repository}")
             print(f"runtime: {pipeline.runtime}")
             print(f"command: {pipeline.command}")
