@@ -67,7 +67,7 @@ make run ARGS='--help'
 
 ## Update pipeline
 
-Production updates should use explicit released versions, tags, or pinned commits. Avoid deploying by pulling `main` directly.
+Production updates must use explicit release tags matching `vMAJOR.MINOR.PATCH`. Avoid deploying by pulling `main` directly.
 
 ```bash
 make deploy RELEASE=v0.2.0

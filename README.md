@@ -11,6 +11,7 @@ Central repository for deploying, managing, and running BioGeMT research pipelin
 - Pipeline source code remains in its own repository.
 - Each pipeline has an isolated software environment.
 - Production deployments use pinned versions.
+- Every integrated pipeline must publish versioned releases.
 - Shared reference data is stored outside pipeline repositories.
 - Pipeline runs and results are stored separately from source code.
 
@@ -44,6 +45,7 @@ BioGeMT-Pipelines/
 │   ├── server.example.yaml
 │   └── server.env.example
 ├── docs/
+│   ├── pipeline-policy.md
 │   └── deployment.md
 └── .gitignore
 ```
@@ -61,6 +63,8 @@ This repository only defines how the pipeline is installed, updated, and launche
 ## Release-based deployment
 
 Production deployments should use explicit released versions, tags, or pinned commits. Do not deploy production by implicitly tracking `main`.
+
+Integrated pipelines must publish release tags matching `vMAJOR.MINOR.PATCH`; see `docs/pipeline-policy.md`.
 
 Install and activate a released version on a server:
 

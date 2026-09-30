@@ -14,6 +14,8 @@ fi
 RELEASE="$1"
 RELEASE_DIR="$(release_dir_for "$RELEASE")"
 
+require_release "$RELEASE"
+
 if [[ ! -d "$RELEASE_DIR/.git" ]]; then
     echo "Release $RELEASE is not installed at $RELEASE_DIR" >&2
     echo "Install it first with ./scripts/install.sh $RELEASE" >&2

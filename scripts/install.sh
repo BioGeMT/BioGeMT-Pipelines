@@ -14,6 +14,7 @@ fi
 RELEASE="$1"
 RELEASE_DIR="$(release_dir_for "$RELEASE")"
 
+require_release "$RELEASE"
 require_command git
 require_command uv
 ensure_server_layout
