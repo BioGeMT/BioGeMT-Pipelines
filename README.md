@@ -12,7 +12,7 @@ This repository does not contain pipeline source code. Each pipeline remains in 
 
 ## For Users
 
-After cloning this repository, no manual installation step is required for the BioGeMT Pipelines controller. Commands run through `uv`, which creates the local environment automatically on first use.
+After cloning this repository, commands run through `uv`, which creates the local environment automatically on first use.
 
 Browse available pipelines:
 
