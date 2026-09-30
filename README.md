@@ -6,7 +6,9 @@ This repository does not contain pipeline source code. Each pipeline remains in 
 
 ## Current pipelines
 
-- `genomic_region_annotator`
+| Pipeline | What it does |
+| --- | --- |
+| `genomic_region_annotator` | Annotates genomic regions and helps connect BED-like intervals to nearby genes and genomic context. |
 
 ## Design principles
 
@@ -55,6 +57,18 @@ BioGeMT-Pipelines/
 
 Most users only need `make run`. Administrators use `make deploy` when a new pipeline release is ready.
 
+Browse available pipelines:
+
+```bash
+make list
+```
+
+Learn whether a pipeline matches your analysis:
+
+```bash
+make info PIPELINE=genomic_region_annotator
+```
+
 Run the active pipeline:
 
 ```bash
@@ -76,12 +90,6 @@ make rollback PIPELINE=genomic_region_annotator RELEASE=v0.1.0
 ## Admin commands
 
 Use the Python CLI through `uv`. The `Makefile` is a convenience wrapper around the same CLI.
-
-List registered pipelines:
-
-```bash
-make list
-```
 
 Show deployment info:
 

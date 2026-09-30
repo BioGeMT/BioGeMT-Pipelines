@@ -50,8 +50,9 @@ def main(argv: list[str] | None = None) -> int:
         server = load_server_config(args.config)
 
         if args.command == "list":
-            for name in sorted(load_pipelines()):
-                print(name)
+            for pipeline in sorted(load_pipelines().values(), key=lambda item: item.name):
+                summary = f" - {pipeline.description}" if pipeline.description else ""
+                print(f"{pipeline.name}: {pipeline.display_name}{summary}")
             return 0
 
         if args.command == "doctor":
@@ -67,8 +68,17 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "info":
             paths = PipelinePaths.for_pipeline(server, pipeline)
             print(f"name: {pipeline.name}")
+            print(f"display_name: {pipeline.display_name}")
             if pipeline.description:
                 print(f"description: {pipeline.description}")
+            if pipeline.keywords:
+                print(f"keywords: {', '.join(pipeline.keywords)}")
+            if pipeline.use_cases:
+                print("use_cases:")
+                for use_case in pipeline.use_cases:
+                    print(f"  - {use_case}")
+            if pipeline.example_args:
+                print(f"example: make run PIPELINE={pipeline.name} ARGS='-- {' '.join(pipeline.example_args)}'")
             print(f"repository: {pipeline.repository}")
             print(f"runtime: {pipeline.runtime}")
             print(f"command: {pipeline.command}")

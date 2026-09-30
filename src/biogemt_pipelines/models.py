@@ -13,7 +13,11 @@ class ReleasePolicy:
 @dataclass(frozen=True)
 class Pipeline:
     name: str
+    display_name: str
     description: str
+    keywords: tuple[str, ...]
+    use_cases: tuple[str, ...]
+    example_args: tuple[str, ...]
     repository: str
     runtime: str
     command: str

@@ -48,7 +48,11 @@ def load_pipeline(path: Path) -> Pipeline:
 
     return Pipeline(
         name=_required_string(loaded, "name", path),
+        display_name=str(loaded.get("display_name", loaded["name"])).strip(),
         description=str(loaded.get("description", "")).strip(),
+        keywords=_string_tuple(loaded.get("keywords", []), "keywords", path),
+        use_cases=_string_tuple(loaded.get("use_cases", []), "use_cases", path),
+        example_args=_string_tuple(loaded.get("example_args", ["--help"]), "example_args", path),
         repository=_required_string(loaded, "repository", path),
         runtime=_required_string(loaded, "runtime", path),
         command=_required_string(loaded, "command", path),
@@ -84,3 +88,14 @@ def _required_string(data: dict[str, Any], key: str, path: Path) -> str:
     if not isinstance(value, str) or not value.strip():
         raise ValueError(f"Missing required string field '{key}' in {path}")
     return value
+
+
+def _string_tuple(value: Any, key: str, path: Path) -> tuple[str, ...]:
+    if not isinstance(value, list):
+        raise ValueError(f"Field '{key}' must be a list in {path}")
+    items: list[str] = []
+    for item in value:
+        if not isinstance(item, str) or not item.strip():
+            raise ValueError(f"Field '{key}' must contain only non-empty strings in {path}")
+        items.append(item.strip())
+    return tuple(items)

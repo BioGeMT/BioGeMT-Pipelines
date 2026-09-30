@@ -17,7 +17,16 @@ Create a file in `pipelines/` named after the pipeline:
 
 ```yaml
 name: example_pipeline
+display_name: Example Pipeline
 description: Short human-readable summary of what the pipeline does.
+keywords:
+  - keyword one
+  - keyword two
+use_cases:
+  - Explain the main biological question this pipeline helps answer.
+  - Explain the input data type users should have.
+example_args:
+  - --help
 repository: https://github.com/BioGeMT/example_pipeline.git
 runtime: uv
 command: example-pipeline
@@ -32,6 +41,13 @@ release_policy:
 
 ```bash
 make doctor
+```
+
+Check how the pipeline appears in the catalog:
+
+```bash
+make list
+make info PIPELINE=example_pipeline
 ```
 
 ## Deploy
