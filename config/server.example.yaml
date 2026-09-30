@@ -1,0 +1,6 @@
+root: /srv/biogemt
+
+pipelines_dir: /srv/biogemt/pipelines
+data_dir: /srv/biogemt/data
+runs_dir: /srv/biogemt/runs
+logs_dir: /srv/biogemt/logs

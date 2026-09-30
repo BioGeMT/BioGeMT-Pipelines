@@ -1,0 +1,24 @@
+# Server-specific configuration
+config/server.yaml
+config/server.env
+
+# Local environments
+.venv/
+venv/
+
+# Python cache/test artifacts
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Logs and runtime output
+*.log
+logs/
+runs/
+
+# OS/editor files
+.DS_Store
+.idea/
+.vscode/

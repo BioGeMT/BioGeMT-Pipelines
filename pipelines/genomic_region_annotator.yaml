@@ -1,0 +1,15 @@
+name: genomic_region_annotator
+
+repository: https://github.com/BioGeMT/genomic_region_annotator.git
+
+install_dir: /srv/biogemt/pipelines/genomic_region_annotator
+
+runtime: uv
+
+default_branch: main
+
+command: genomic-region-annotator
+
+data_dir: /srv/biogemt/data
+
+runs_dir: /srv/biogemt/runs/genomic_region_annotator
