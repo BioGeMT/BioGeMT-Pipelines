@@ -17,6 +17,9 @@ The default production layout is:
 ```text
 /srv/biogemt/
 ├── pipelines/
+│   └── genomic_region_annotator/
+│       ├── current -> releases/v0.1.0
+│       └── releases/
 ├── data/
 ├── runs/
 └── logs/
@@ -46,56 +49,51 @@ sudo chgrp -R biogemt /srv/biogemt
 sudo chmod -R g+rwx /srv/biogemt
 ```
 
-Install the Genomic Region Annotator pipeline:
+Install and activate a released Genomic Region Annotator version:
 
 ```bash
-./scripts/install.sh
+make install RELEASE=v0.1.0
 ```
 
-Install a specific branch, tag, or commit:
-
-```bash
-./scripts/install.sh v0.1.0
-```
+This creates a release-specific checkout under `releases/` and points `current` to it.
 
 ## Verify installation
 
 Run the wrapper with the pipeline help command:
 
 ```bash
-./scripts/run.sh --help
+make run ARGS='--help'
 ```
 
 ## Update pipeline
 
-Production updates should use explicit versions, tags, or pinned commits. Avoid deploying by pulling `main` directly.
+Production updates should use explicit released versions, tags, or pinned commits. Avoid deploying by pulling `main` directly.
 
 ```bash
-./scripts/update.sh v0.2.0
+make deploy RELEASE=v0.2.0
 ```
 
 The update script performs:
 
-1. Checks that the installed pipeline has no local changes.
+1. Creates or reuses a release-specific checkout under `releases/`.
 2. `git fetch --tags`
 3. `git checkout <version>`
 4. `uv sync --frozen`
 5. `uv run pytest`
+6. Updates the `current` symlink only after setup and tests pass.
 
 ## Rollback pipeline
 
 Rollback is the same operation with a previous known-good version:
 
 ```bash
-./scripts/update.sh v0.1.0
+make rollback RELEASE=v0.1.0
 ```
 
-For urgent manual rollback inside the installed pipeline directory:
+For urgent manual rollback without `make`, activate the installed release directly:
 
 ```bash
-cd /srv/biogemt/pipelines/genomic_region_annotator
-git checkout v0.1.0
-uv sync --frozen
+./scripts/activate.sh v0.1.0
 ```
 
 ## Notes

@@ -6,7 +6,7 @@ install_dir: /srv/biogemt/pipelines/genomic_region_annotator
 
 runtime: uv
 
-default_branch: main
+release_policy: tags
 
 command: genomic-region-annotator
 

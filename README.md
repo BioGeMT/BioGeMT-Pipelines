@@ -19,6 +19,9 @@ Central repository for deploying, managing, and running BioGeMT research pipelin
 ```text
 /srv/biogemt/
 ├── pipelines/
+│   └── genomic_region_annotator/
+│       ├── current -> releases/v0.1.0
+│       └── releases/
 ├── data/
 ├── runs/
 └── logs/
@@ -28,10 +31,12 @@ Central repository for deploying, managing, and running BioGeMT research pipelin
 
 ```text
 BioGeMT-Pipelines/
+├── Makefile
 ├── README.md
 ├── pipelines/
 │   └── genomic_region_annotator.yaml
 ├── scripts/
+│   ├── activate.sh
 │   ├── install.sh
 │   ├── update.sh
 │   └── run.sh
@@ -53,30 +58,40 @@ https://github.com/BioGeMT/genomic_region_annotator.git
 
 This repository only defines how the pipeline is installed, updated, and launched on shared infrastructure.
 
-## Quick start
+## Release-based deployment
 
-Install the current pipeline on a server:
+Production deployments should use explicit released versions, tags, or pinned commits. Do not deploy production by implicitly tracking `main`.
+
+Install and activate a released version on a server:
 
 ```bash
-./scripts/install.sh
+make install RELEASE=v0.1.0
 ```
 
-Install a specific branch, tag, or commit:
+Run the active release through the `current` symlink:
+
+```bash
+make run ARGS='--help'
+```
+
+Activate another released version:
+
+```bash
+make deploy RELEASE=v0.2.0
+```
+
+Rollback by re-activating a previous release:
+
+```bash
+make rollback RELEASE=v0.1.0
+```
+
+The underlying scripts are still available for automation:
 
 ```bash
 ./scripts/install.sh v0.1.0
-```
-
-Run the pipeline wrapper:
-
-```bash
-./scripts/run.sh --help
-```
-
-Deploy a pinned release or tag:
-
-```bash
-./scripts/update.sh v0.1.0
+./scripts/update.sh v0.2.0
+./scripts/activate.sh v0.1.0
 ```
 
 ## Server-specific configuration

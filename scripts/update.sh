@@ -7,27 +7,37 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/lib/common.sh"
 
 if [[ $# -ne 1 ]]; then
-    echo "Usage: $0 <version-or-tag>" >&2
+    echo "Usage: $0 <release-tag-or-commit>" >&2
     exit 1
 fi
 
-VERSION="$1"
+RELEASE="$1"
 
 require_command git
 require_command uv
-require_installed_pipeline
+ensure_server_layout
 
-cd "$PIPELINE_DIR"
+RELEASE_DIR="$(release_dir_for "$RELEASE")"
 
-if [[ -n "$(git status --porcelain)" ]]; then
-    echo "Refusing to update because $PIPELINE_DIR has local changes." >&2
-    exit 1
+if [[ -d "$RELEASE_DIR/.git" ]]; then
+    cd "$RELEASE_DIR"
+    git fetch --tags
+else
+    git clone "$PIPELINE_REPOSITORY" "$RELEASE_DIR"
+    cd "$RELEASE_DIR"
 fi
 
-git fetch --tags
-git checkout "$VERSION"
+git checkout "$RELEASE"
+
+if [[ -n "$(git status --porcelain)" ]]; then
+    echo "Refusing to activate $RELEASE because $RELEASE_DIR has local changes." >&2
+    exit 1
+fi
 
 uv sync --frozen
 uv run pytest
 
-echo "Updated $PIPELINE_NAME at $PIPELINE_DIR to $VERSION"
+ln -sfn "$RELEASE_DIR" "$PIPELINE_CURRENT_LINK"
+
+echo "Activated $PIPELINE_NAME release $RELEASE"
+echo "Current release: $PIPELINE_CURRENT_LINK -> $RELEASE_DIR"
