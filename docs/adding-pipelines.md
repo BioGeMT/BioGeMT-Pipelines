@@ -48,6 +48,7 @@ Check how the pipeline appears in the catalog:
 ```bash
 make list
 make info PIPELINE=example_pipeline
+make doctor
 ```
 
 ## Deploy

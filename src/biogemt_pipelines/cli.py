@@ -6,6 +6,7 @@ from pathlib import Path
 
 from .config import get_pipeline, load_pipelines, load_server_config
 from .deploy import DeploymentError, activate_release, current_release, install_release, run_pipeline, validate_release
+from .doctor import has_errors, run_checks
 from .models import PipelinePaths
 
 
@@ -19,6 +20,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     info = subparsers.add_parser("info", help="Show pipeline deployment info")
     info.add_argument("pipeline")
+
+    status = subparsers.add_parser("status", help="Show active pipeline release")
+    status.add_argument("pipeline", nargs="?")
 
     deploy = subparsers.add_parser("deploy", help="Deploy a tested release")
     deploy.add_argument("pipeline")
@@ -57,10 +61,18 @@ def main(argv: list[str] | None = None) -> int:
 
         if args.command == "doctor":
             pipelines = load_pipelines()
-            for pipeline in pipelines.values():
-                if args.release:
-                    validate_release(pipeline, args.release)
-                print(f"ok {pipeline.name}")
+            results = run_checks(pipelines, server, args.release)
+            for result in results:
+                print(f"{result.status} {result.name}: {result.message}")
+            return 1 if has_errors(results) else 0
+
+        if args.command == "status":
+            pipelines = load_pipelines()
+            selected = [args.pipeline] if args.pipeline else sorted(pipelines)
+            for name in selected:
+                pipeline = get_pipeline(name)
+                active = current_release(pipeline, server) or "not deployed"
+                print(f"{pipeline.name}: {active}")
             return 0
 
         pipeline = get_pipeline(args.pipeline)

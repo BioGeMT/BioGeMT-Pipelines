@@ -73,6 +73,12 @@ Browse available pipelines:
 make list
 ```
 
+See which release is currently active:
+
+```bash
+make status
+```
+
 Learn whether a pipeline matches your analysis:
 
 ```bash
@@ -105,6 +111,12 @@ Show deployment info:
 
 ```bash
 make info PIPELINE=genomic_region_annotator
+```
+
+Check that the server and registry are ready:
+
+```bash
+make doctor
 ```
 
 Equivalent direct CLI calls:

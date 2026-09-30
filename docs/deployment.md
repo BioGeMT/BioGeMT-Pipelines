@@ -63,6 +63,18 @@ Run the active release with the pipeline help command:
 make run PIPELINE=genomic_region_annotator ARGS='-- --help'
 ```
 
+Check the active release:
+
+```bash
+make status
+```
+
+Run server readiness checks:
+
+```bash
+make doctor
+```
+
 ## Deploy pipeline release
 
 Production updates must use explicit release tags matching `vMAJOR.MINOR.PATCH`. Deploying moving branches is unsupported.
