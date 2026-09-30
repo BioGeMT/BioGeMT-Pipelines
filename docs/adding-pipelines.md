@@ -26,6 +26,13 @@ keywords:
 use_cases:
   - Explain the main biological question this pipeline helps answer.
   - Explain the input data type users should have.
+input_formats:
+  - TSV
+output_formats:
+  - TSV
+result_files:
+  - output/results.tsv
+visualization_ready: false
 example_args:
   - --help
 repository: https://github.com/BioGeMT/example_pipeline.git
@@ -73,3 +80,13 @@ The active release is always:
 ```
 
 This keeps rollback simple and lets different pipelines move independently.
+
+## Run outputs
+
+Pipeline code should respect the run directory environment variables created by the controller, especially:
+
+- `BIOGEMT_RUN_DIR`
+- `BIOGEMT_OUTPUT_DIR`
+- `BIOGEMT_LOG_DIR`
+
+Durable user-facing results should be written under `BIOGEMT_OUTPUT_DIR`.

@@ -11,6 +11,16 @@ use_cases:
   - Annotate genomic intervals from BED-like files.
   - Explore nearby genes and genomic context for candidate regions.
   - Prepare region-level annotation tables for downstream biological interpretation.
+input_formats:
+  - BED
+  - BED-like TSV
+output_formats:
+  - TSV
+  - CSV
+result_files:
+  - output/annotations.tsv
+  - logs/pipeline.log
+visualization_ready: false
 example_args:
   - --help
 repository: https://github.com/BioGeMT/genomic_region_annotator.git

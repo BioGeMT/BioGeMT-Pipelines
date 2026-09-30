@@ -24,6 +24,11 @@ The default production layout is:
 │       └── releases/
 ├── data/
 ├── runs/
+│   └── genomic_region_annotator/
+│       └── <run_id>/
+│           ├── output/
+│           ├── logs/
+│           └── tmp/
 └── logs/
 ```
 
@@ -62,6 +67,8 @@ Run the active release with the pipeline help command:
 ```bash
 make run PIPELINE=genomic_region_annotator ARGS='-- --help'
 ```
+
+Pipeline runs create structured output directories under `/srv/biogemt/runs/<pipeline>/<run_id>/`. See `docs/runs.md`.
 
 Check the active release:
 

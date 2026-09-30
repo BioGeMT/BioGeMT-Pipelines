@@ -18,7 +18,11 @@ class Pipeline:
     responsible: str
     keywords: tuple[str, ...]
     use_cases: tuple[str, ...]
+    input_formats: tuple[str, ...]
+    output_formats: tuple[str, ...]
+    result_files: tuple[str, ...]
     example_args: tuple[str, ...]
+    visualization_ready: bool
     repository: str
     runtime: str
     command: str

@@ -1,5 +1,6 @@
 SHELL := /usr/bin/env bash
 PIPELINE ?= genomic_region_annotator
+RUN_ID_ARG = $(if $(RUN_ID),--run-id "$(RUN_ID)",)
 
 .PHONY: help list info status deploy update activate rollback run doctor
 
@@ -10,6 +11,7 @@ help:
 	@echo "  make list                              Browse available pipelines"
 	@echo "  make status                            Show active pipeline releases"
 	@echo "  make run ARGS='-- --help'              Run the active pipeline"
+	@echo "  make run RUN_ID=my_run ARGS='-- ...'   Run with a named output folder"
 	@echo "  make deploy RELEASE=v0.2.0             Admin: deploy a tested release"
 	@echo "  make rollback RELEASE=v0.1.0           Admin: switch to previous release"
 	@echo "  make info PIPELINE=$(PIPELINE)          Show pipeline details"
@@ -35,7 +37,7 @@ activate rollback:
 	uv run biogemt-pipelines rollback "$(PIPELINE)" --release "$(RELEASE)"
 
 run:
-	uv run biogemt-pipelines run "$(PIPELINE)" $(ARGS)
+	uv run biogemt-pipelines run $(RUN_ID_ARG) "$(PIPELINE)" $(ARGS)
 
 doctor:
 	uv run biogemt-pipelines doctor

@@ -4,6 +4,7 @@ import os
 import re
 import shlex
 import subprocess
+from datetime import datetime, timezone
 from pathlib import Path
 
 from .models import Pipeline, PipelinePaths, ServerConfig
@@ -80,7 +81,7 @@ def activate_release(pipeline: Pipeline, server: ServerConfig, release: str) -> 
     return target
 
 
-def run_pipeline(pipeline: Pipeline, server: ServerConfig, args: list[str]) -> int:
+def run_pipeline(pipeline: Pipeline, server: ServerConfig, args: list[str], *, run_id: str | None = None) -> int:
     require_supported_runtime(pipeline)
     paths = PipelinePaths.for_pipeline(server, pipeline)
     current = paths.current_link
@@ -88,16 +89,34 @@ def run_pipeline(pipeline: Pipeline, server: ServerConfig, args: list[str]) -> i
     if not current.joinpath(".git").is_dir():
         raise DeploymentError(f"Pipeline is not installed at {current}")
 
+    run_id = run_id or default_run_id()
+    run_dir = paths.runs_dir / run_id
+    output_dir = run_dir / "output"
+    log_dir = run_dir / "logs"
+    tmp_dir = run_dir / "tmp"
+
+    for directory in [output_dir, log_dir, tmp_dir]:
+        directory.mkdir(parents=True, exist_ok=True)
+
     env = os.environ.copy()
     env.update(
         {
             "BIOGEMT_DATA_DIR": str(paths.data_dir),
             "BIOGEMT_RUNS_DIR": str(paths.runs_dir),
+            "BIOGEMT_RUN_ID": run_id,
+            "BIOGEMT_RUN_DIR": str(run_dir),
+            "BIOGEMT_OUTPUT_DIR": str(output_dir),
             "BIOGEMT_LOGS_DIR": str(paths.logs_dir),
+            "BIOGEMT_LOG_DIR": str(log_dir),
+            "BIOGEMT_TMP_DIR": str(tmp_dir),
         }
     )
     completed = subprocess.run(["uv", "run", pipeline.command, *args], cwd=current, env=env, check=False)
     return completed.returncode
+
+
+def default_run_id() -> str:
+    return datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
 
 
 def current_release(pipeline: Pipeline, server: ServerConfig) -> str | None:

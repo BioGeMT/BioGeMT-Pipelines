@@ -37,6 +37,7 @@ def build_parser() -> argparse.ArgumentParser:
     rollback.add_argument("--release", required=True)
 
     run = subparsers.add_parser("run", help="Run the active pipeline")
+    run.add_argument("--run-id", help="Optional run identifier used under the pipeline runs directory")
     run.add_argument("pipeline")
     run.add_argument("args", nargs=argparse.REMAINDER)
 
@@ -91,6 +92,15 @@ def main(argv: list[str] | None = None) -> int:
                 print("use_cases:")
                 for use_case in pipeline.use_cases:
                     print(f"  - {use_case}")
+            if pipeline.input_formats:
+                print(f"input_formats: {', '.join(pipeline.input_formats)}")
+            if pipeline.output_formats:
+                print(f"output_formats: {', '.join(pipeline.output_formats)}")
+            if pipeline.result_files:
+                print("result_files:")
+                for result_file in pipeline.result_files:
+                    print(f"  - {result_file}")
+            print(f"visualization_ready: {str(pipeline.visualization_ready).lower()}")
             if pipeline.example_args:
                 print(f"example: make run PIPELINE={pipeline.name} ARGS='-- {' '.join(pipeline.example_args)}'")
             print(f"repository: {pipeline.repository}")
@@ -113,7 +123,7 @@ def main(argv: list[str] | None = None) -> int:
             pipeline_args = args.args
             if pipeline_args and pipeline_args[0] == "--":
                 pipeline_args = pipeline_args[1:]
-            return run_pipeline(pipeline, server, pipeline_args)
+            return run_pipeline(pipeline, server, pipeline_args, run_id=args.run_id)
 
         parser.error(f"Unhandled command: {args.command}")
         return 2
