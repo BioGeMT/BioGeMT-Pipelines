@@ -1,6 +1,6 @@
 # BioGeMT Pipelines
 
-Deployment controller for installing, updating, rolling back, and running BioGeMT research pipelines on shared infrastructure.
+Deployment controller for running BioGeMT research pipelines on shared infrastructure.
 
 This repository does not contain pipeline source code. Each pipeline remains in its own repository and is deployed here only through explicit releases.
 
@@ -51,7 +51,29 @@ BioGeMT-Pipelines/
 └── logs/
 ```
 
-## CLI workflow
+## Simple workflow
+
+Most users only need `make run`. Administrators use `make deploy` when a new pipeline release is ready.
+
+Run the active pipeline:
+
+```bash
+make run PIPELINE=genomic_region_annotator ARGS='-- --help'
+```
+
+Deploy a tested release:
+
+```bash
+make deploy PIPELINE=genomic_region_annotator RELEASE=v0.2.0
+```
+
+Rollback to a previous release:
+
+```bash
+make rollback PIPELINE=genomic_region_annotator RELEASE=v0.1.0
+```
+
+## Admin commands
 
 Use the Python CLI through `uv`. The `Makefile` is a convenience wrapper around the same CLI.
 
@@ -65,30 +87,6 @@ Show deployment info:
 
 ```bash
 make info PIPELINE=genomic_region_annotator
-```
-
-Install and activate a release without tests:
-
-```bash
-make install PIPELINE=genomic_region_annotator RELEASE=v0.1.0
-```
-
-Deploy a release with tests:
-
-```bash
-make deploy PIPELINE=genomic_region_annotator RELEASE=v0.2.0
-```
-
-Rollback to an already installed release:
-
-```bash
-make rollback PIPELINE=genomic_region_annotator RELEASE=v0.1.0
-```
-
-Run the active release:
-
-```bash
-make run PIPELINE=genomic_region_annotator ARGS='-- --help'
 ```
 
 Equivalent direct CLI calls:

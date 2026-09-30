@@ -20,23 +20,19 @@ def build_parser() -> argparse.ArgumentParser:
     info = subparsers.add_parser("info", help="Show pipeline deployment info")
     info.add_argument("pipeline")
 
-    install = subparsers.add_parser("install", help="Install and activate a release without tests")
-    install.add_argument("pipeline")
-    install.add_argument("--release", required=True)
-
-    deploy = subparsers.add_parser("deploy", help="Install, test, and activate a release")
+    deploy = subparsers.add_parser("deploy", help="Deploy a tested release")
     deploy.add_argument("pipeline")
     deploy.add_argument("--release", required=True)
 
-    activate = subparsers.add_parser("activate", help="Activate an already installed release")
+    activate = subparsers.add_parser("activate", help="Switch to a previously deployed release")
     activate.add_argument("pipeline")
     activate.add_argument("--release", required=True)
 
-    rollback = subparsers.add_parser("rollback", help="Alias for activate")
+    rollback = subparsers.add_parser("rollback", help="Switch back to a previous release")
     rollback.add_argument("pipeline")
     rollback.add_argument("--release", required=True)
 
-    run = subparsers.add_parser("run", help="Run the active pipeline release")
+    run = subparsers.add_parser("run", help="Run the active pipeline")
     run.add_argument("pipeline")
     run.add_argument("args", nargs=argparse.REMAINDER)
 
@@ -79,10 +75,6 @@ def main(argv: list[str] | None = None) -> int:
             print(f"release_pattern: {pipeline.release_policy.tag_pattern}")
             print(f"current_release: {current_release(pipeline, server) or 'none'}")
             print(f"base_dir: {paths.base_dir}")
-            return 0
-
-        if args.command == "install":
-            install_release(pipeline, server, args.release, run_tests=False)
             return 0
 
         if args.command == "deploy":

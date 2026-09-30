@@ -45,13 +45,13 @@ sudo chgrp -R biogemt /srv/biogemt
 sudo chmod -R g+rwx /srv/biogemt
 ```
 
-Install and activate a released Genomic Region Annotator version:
+Deploy the first Genomic Region Annotator release:
 
 ```bash
-make install PIPELINE=genomic_region_annotator RELEASE=v0.1.0
+make deploy PIPELINE=genomic_region_annotator RELEASE=v0.1.0
 ```
 
-This creates a release-specific checkout under `releases/` and points `current` to it.
+This creates a release-specific checkout under `releases/`, runs the deployment tests, and points `current` to it.
 
 ## Verify installation
 
@@ -87,7 +87,7 @@ Rollback activates a previous installed release:
 make rollback PIPELINE=genomic_region_annotator RELEASE=v0.1.0
 ```
 
-If the release is not installed yet, deploy or install it first.
+If the release is not installed yet, deploy it first.
 
 ## Notes
 
