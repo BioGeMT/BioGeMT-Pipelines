@@ -10,6 +10,8 @@ This document describes the server deployment flow for BioGeMT pipelines.
 - Access to the BioGeMT GitHub organization repositories
 - Write access to `/srv/biogemt` or a custom root in `config/server.yaml`
 
+The BioGeMT Pipelines controller itself does not require a separate installation step after cloning this repository. Use `uv run` or the provided `make` commands; `uv` creates the local environment automatically on first use.
+
 ## Server layout
 
 The default production layout is:

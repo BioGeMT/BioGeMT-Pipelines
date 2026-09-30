@@ -57,6 +57,16 @@ BioGeMT-Pipelines/
 
 Most users only need `make run`. Administrators use `make deploy` when a new pipeline release is ready.
 
+After cloning this repository, no manual installation step is required for the BioGeMT Pipelines controller. Commands run through `uv`, which creates the local environment automatically on first use.
+
+Check that the controller works:
+
+```bash
+make list
+```
+
+The actual pipeline software must already be deployed on the shared server before users can run it. Deployment is an administrator action.
+
 Browse available pipelines:
 
 ```bash
