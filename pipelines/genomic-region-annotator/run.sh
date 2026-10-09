@@ -19,6 +19,19 @@ if ! command -v docker >/dev/null 2>&1; then
   exit 127
 fi
 
+if ! docker image inspect "${IMAGE}" >/dev/null 2>&1; then
+  if ! docker manifest inspect "${IMAGE}" >/dev/null 2>&1; then
+    cat >&2 <<ERROR
+Unable to access ${IMAGE}.
+
+The image is not available locally and Docker cannot read it from GHCR.
+If Docker reports "unauthorized", either make the GHCR package public or run
+'docker login ghcr.io' with an account/token that can read BioGeMT packages.
+ERROR
+    exit 125
+  fi
+fi
+
 mounts=(
   -v "${PWD}:${PWD}"
   -w "${PWD}"

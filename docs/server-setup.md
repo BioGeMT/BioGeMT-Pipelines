@@ -67,6 +67,12 @@ docker pull ghcr.io/biogemt/genomic-region-annotator:0.1.0
 docker run --rm ghcr.io/biogemt/genomic-region-annotator:0.1.0 --help
 ```
 
+If `docker pull` reports `unauthorized`, the GHCR package is not publicly readable for anonymous pulls. Either make the package public in GitHub Packages, or authenticate Docker with an account/token that has package read access:
+
+```bash
+docker login ghcr.io
+```
+
 ## 7. Run Doctor
 
 ```bash

@@ -61,10 +61,22 @@ fi
 
 if command -v docker >/dev/null 2>&1 && docker image inspect "${IMAGE}" >/dev/null 2>&1; then
   check_ok "Configured image is available locally"
-elif command -v docker >/dev/null 2>&1 && docker manifest inspect "${IMAGE}" >/dev/null 2>&1; then
-  check_ok "Configured image can be resolved from registry"
+elif command -v docker >/dev/null 2>&1; then
+  set +e
+  manifest_output="$(docker manifest inspect "${IMAGE}" 2>&1 >/dev/null)"
+  manifest_status=$?
+  set -e
+  if [[ ${manifest_status} -eq 0 ]]; then
+    check_ok "Configured image can be resolved from registry"
+  elif [[ "${manifest_output}" == *unauthorized* ]]; then
+    check_fail "Configured image exists behind GHCR authorization or is not public: ${IMAGE}"
+    check_warn "Make the GHCR package public, or run 'docker login ghcr.io' with package read access."
+  else
+    check_fail "Configured image is not local and could not be resolved: ${IMAGE}"
+    check_warn "Docker said: ${manifest_output}"
+  fi
 else
-  check_fail "Configured image is not local and could not be resolved: ${IMAGE}"
+  check_fail "Configured image could not be checked because Docker is unavailable"
 fi
 
 if [[ "${ok}" == true ]]; then
