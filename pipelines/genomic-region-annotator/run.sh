@@ -19,14 +19,27 @@ if ! command -v docker >/dev/null 2>&1; then
 fi
 
 if ! docker image inspect "${IMAGE}" >/dev/null 2>&1; then
-  if ! docker manifest inspect "${IMAGE}" >/dev/null 2>&1; then
+  if ! manifest_output="$(docker manifest inspect "${IMAGE}" 2>&1)"; then
     cat >&2 <<ERROR
 Unable to access ${IMAGE}.
 
-The image is not available locally and Docker cannot read it from GHCR.
-If Docker reports "unauthorized", either make the GHCR package public or run
-'docker login ghcr.io' with an account/token that can read BioGeMT packages.
+The image is not available locally, and Docker could not read it from GHCR.
+The launcher must start the container to run any command, including --help.
+
+Docker reported:
+${manifest_output}
 ERROR
+    if [[ "${manifest_output}" == *unauthorized* || "${manifest_output}" == *denied* ]]; then
+      cat >&2 <<ERROR
+GHCR denied access. The package may be private, or Docker may not have credentials
+with read access. Make the package public, or run 'docker login ghcr.io' with an
+account/token that can read BioGeMT packages.
+ERROR
+    elif [[ "${manifest_output}" == *"manifest unknown"* || "${manifest_output}" == *"not found"* ]]; then
+      echo "Check that the package name and tag are published: ${IMAGE}" >&2
+    else
+      echo "Check Docker's network connection to ghcr.io." >&2
+    fi
     exit 125
   fi
 fi
