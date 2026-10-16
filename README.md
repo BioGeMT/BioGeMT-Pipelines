@@ -1,81 +1,112 @@
 # BioGeMT Pipelines
 
-Small deployment and launcher repository for BioGeMT research pipelines on a shared lab server.
+BioGeMT Pipelines is a small command-line launcher for running BioGeMT tools on a shared server. It keeps the pipeline code and Python dependencies in versioned Docker images, and gives users one command, `biogemt`, to run them.
 
-This repository does **not** contain pipeline source code. Individual pipelines remain in their own repositories and publish Docker images. This repository provides server-facing launchers that hide ordinary Docker usage from lab users.
+This repository contains the launcher and server setup instructions. It does not contain the pipeline source code. The launcher passes pipeline arguments to the container and makes the user's working directory and shared reference data available to it.
 
-## Current Pipelines
+## Before you start
+
+Ask your server administrator to set up this repository and make `biogemt` available on your `PATH`. You need:
+
+- Docker installed and running on the server, with your account allowed to use it.
+- Access to the BioGeMT pipeline image in GitHub Container Registry (GHCR). If the image is public, Docker can download it without login; otherwise, log in with an account that has package read access.
+- An input TSV and either a GTF file or network access to download an Ensembl GTF.
+
+Administrators can follow [the shared server setup guide](docs/server-setup.md).
+
+## Find and inspect commands
+
+List the available pipelines and check that the server is ready:
+
+```bash
+biogemt list
+biogemt doctor
+```
+
+The current pipeline is `genomic-region-annotator`. To see all options for a command, pass `--help` after the pipeline command:
+
+```bash
+biogemt run genomic-region-annotator --help
+biogemt run genomic-region-annotator annotate --help
+biogemt run genomic-region-annotator summarize-sites --help
+```
+
+Everything after the pipeline name is passed to that pipeline's command inside Docker.
+
+## Run an annotation
+
+Run commands from a work directory that contains your input file and where you want results written. The input TSV must contain `chr`, `start`, `end`, and `strand` columns. Coordinates are treated as 1-based inclusive by default; add `--coords bed` for 0-based, half-open BED coordinates.
+
+For example, a tab-separated input can start like this:
 
 ```text
-genomic-region-annotator
+chr	start	end	strand
+1	1000	1050	+
 ```
 
-## Quick Start
-
-Add `bin/` to your `PATH` or run commands from this repository:
+For example, to use a GTF already in your work directory:
 
 ```bash
-bin/biogemt list
-```
-
-Run the Genomic Region Annotator through Docker:
-
-```bash
-bin/biogemt run genomic-region-annotator \
-  annotate \
-  --input input.tsv \
+cd /path/to/your/work
+biogemt run genomic-region-annotator annotate \
+  --input regions.tsv \
   --gtf annotation.gtf \
-  --output results/output.tsv
+  --output results/regions.tsv \
+  --report
 ```
 
-Users do not need to run `conda activate`, `pip install`, `uv sync`, clone `genomic_region_annotator`, or call `docker run` directly.
+Use exactly one of `--gtf` or `--release`. To download an Ensembl GTF for the run instead, replace `--gtf annotation.gtf` with `--release 115`. The default species is human (`homo_sapiens`); use `--species` and, if needed, `--assembly` to select another reference. Choose a release and assembly that match your analysis.
+
+`annotate` is step 1: it records transcript overlap evidence. `--output` is the output base name, not a single TSV file. The command writes these files under `results/step1/`:
+
+- `regions_input_with_ids.tsv`: input rows with stable IDs
+- `regions_matrix.tsv`: region-overlap evidence
+- `regions_transcripts.tsv`: overlapping transcripts
+- `regions_step1_stats.tsv`: run statistics
+
+`summarize-sites` is step 2: it applies the default transcript-selection policy (`clash_utr3_first`) and summarizes region coverage. Run it to produce the final summaries:
+
+```bash
+biogemt run genomic-region-annotator summarize-sites \
+  --transcripts results/step1/regions_transcripts.tsv \
+  --matrix results/step1/regions_matrix.tsv \
+  --input-with-ids results/step1/regions_input_with_ids.tsv \
+  --report
+```
+
+This writes the site summary, final table, and statistics under `results/step2/`. The main result is `results/step2/regions_final.tsv`.
+
+## Where files are visible
+
+The launcher mounts the directory where you run `biogemt` into the container at the same path, with read-write access. Relative paths such as `regions.tsv` and `results/regions.tsv` are resolved from that directory. The container also receives `BIOGEMT_DATA` as a read-only mount for shared reference files.
+
+Files outside your working directory and `BIOGEMT_DATA` are not available inside the container. If your GTF is in the shared data directory, pass its path there, for example:
+
+```bash
+--gtf /srv/biogemt/data/genomic-region-annotator/annotation.gtf
+```
+
+When using `--release`, the downloaded GTF and cache are stored in the working directory by default (`data/annotations/` and `.cache/genomic-region-annotator/`). You can change those locations with `--outdir` and `--cache-dir`.
 
 ## Configuration
 
-Defaults target the shared server layout under `/srv/biogemt`:
+The default shared paths are:
 
-```bash
+```text
 BIOGEMT_ROOT=/srv/biogemt
 BIOGEMT_DATA=/srv/biogemt/data
-BIOGEMT_RUNS=/srv/biogemt/runs
 ```
 
-For server-specific paths, copy and edit:
+The server administrator can create `config/server.env` from [`config/server.env.example`](config/server.env.example) and change the paths. If only `BIOGEMT_ROOT` is changed, `BIOGEMT_DATA` defaults to its `data/` subdirectory. Set `BIOGEMT_DATA` explicitly if reference files are stored elsewhere. `config/server.env` is ignored by Git. To use a different config file, set `BIOGEMT_CONFIG=/path/to/server.env`.
 
-```bash
-cp config/server.env.example config/server.env
-```
+The current pipeline image is `ghcr.io/biogemt/genomic-region-annotator:0.1.0`. For local testing, set `BIOGEMT_GENOMIC_REGION_ANNOTATOR_IMAGE` to override it.
 
-`config/server.env` is intentionally ignored by Git. You can also point to another config file with `BIOGEMT_CONFIG=/path/to/server.env`.
+## Repository layout
 
-## Server Layout
+- `bin/biogemt`: user-facing command and pipeline dispatch
+- `pipelines/<name>/run.sh`: Docker invocation for each pipeline
+- `scripts/doctor.sh`: server and image diagnostics
+- `config/`: example server configuration
+- `docs/`: server setup and maintainer guidance
 
-```text
-/srv/biogemt/
-├── data/
-│   └── genomic-region-annotator/
-├── runs/
-│   └── genomic-region-annotator/
-├── cache/
-│   └── genomic-region-annotator/
-└── logs/
-```
-
-Reference datasets live outside Docker images and should be mounted at runtime. Source-code checkouts and Python environments are not stored in `/srv/biogemt` for containerized tools unless future deployment tooling requires them.
-
-## Commands
-
-```bash
-bin/biogemt list
-bin/biogemt doctor
-bin/biogemt run genomic-region-annotator --help
-```
-
-The current pinned image is:
-
-```text
-ghcr.io/biogemt/genomic-region-annotator:0.1.0
-```
-
-Production should pin an explicit version or digest, not `latest`.
-For local testing, `BIOGEMT_GENOMIC_REGION_ANNOTATOR_IMAGE` can temporarily override this image.
+See [Adding a Pipeline](docs/adding-a-pipeline.md) for the small, explicit steps to add another tool.

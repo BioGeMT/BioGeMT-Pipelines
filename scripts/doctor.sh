@@ -5,14 +5,13 @@ IMAGE="${BIOGEMT_GENOMIC_REGION_ANNOTATOR_IMAGE:-ghcr.io/biogemt/genomic-region-
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 CONFIG_FILE="${BIOGEMT_CONFIG:-${ROOT_DIR}/config/server.env}"
 
-BIOGEMT_ROOT="${BIOGEMT_ROOT:-/srv/biogemt}"
-BIOGEMT_DATA="${BIOGEMT_DATA:-${BIOGEMT_ROOT}/data}"
-BIOGEMT_RUNS="${BIOGEMT_RUNS:-${BIOGEMT_ROOT}/runs}"
-
 if [[ -f "${CONFIG_FILE}" ]]; then
   # shellcheck source=/dev/null
   source "${CONFIG_FILE}"
 fi
+
+BIOGEMT_ROOT="${BIOGEMT_ROOT:-/srv/biogemt}"
+BIOGEMT_DATA="${BIOGEMT_DATA:-${BIOGEMT_ROOT}/data}"
 
 ok=true
 check_ok() { printf '[OK] %s\n' "$1"; }
@@ -22,7 +21,6 @@ check_fail() { printf '[FAIL] %s\n' "$1"; ok=false; }
 printf 'BioGeMT doctor\n'
 printf 'Root: %s\n' "${BIOGEMT_ROOT}"
 printf 'Data: %s\n' "${BIOGEMT_DATA}"
-printf 'Runs: %s\n' "${BIOGEMT_RUNS}"
 printf 'Image: %s\n\n' "${IMAGE}"
 
 if command -v docker >/dev/null 2>&1; then
@@ -47,16 +45,6 @@ if [[ -d "${BIOGEMT_DATA}" && -r "${BIOGEMT_DATA}" ]]; then
   check_ok "BIOGEMT_DATA is readable"
 else
   check_warn "BIOGEMT_DATA does not exist or is not readable yet: ${BIOGEMT_DATA}"
-fi
-
-if [[ -d "${BIOGEMT_RUNS}" ]]; then
-  if [[ -w "${BIOGEMT_RUNS}" ]]; then
-    check_ok "BIOGEMT_RUNS is writable"
-  else
-    check_fail "BIOGEMT_RUNS exists but is not writable: ${BIOGEMT_RUNS}"
-  fi
-else
-  check_warn "BIOGEMT_RUNS does not exist yet: ${BIOGEMT_RUNS}"
 fi
 
 if command -v docker >/dev/null 2>&1 && docker image inspect "${IMAGE}" >/dev/null 2>&1; then

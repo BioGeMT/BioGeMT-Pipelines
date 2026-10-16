@@ -1,96 +1,92 @@
-# Shared Server Setup
+# Set Up a Shared Server
 
-This first version supports one Docker-backed pipeline: `genomic-region-annotator`.
+This guide is for the administrator preparing a server for lab users. Set up the launcher once; users can then follow the [usage guide](../README.md#run-an-annotation).
 
-## 1. Install Docker Engine
+BioGeMT Pipelines runs tools in Docker images. It does not install Docker, download reference data, or install pipeline code on the host.
 
-Install Docker Engine using the operating system's recommended process. Do not use this repository to automate host-level Docker installation.
+## 1. Install and secure Docker
 
-## 2. Decide the Docker Security Model
+Install Docker Engine using the procedure recommended for the server's operating system. Make sure Docker is running and that each intended user can run Docker commands.
 
-Membership in the normal `docker` group effectively grants root-level privileges on the host, because users can start containers with broad filesystem access.
+Choose the server's Docker security model before granting access. Membership in the normal `docker` group effectively grants root-level privileges on the host. For a shared lab server, assess rootless Docker or another restricted setup before adding users to that group.
 
-For a shared lab server, evaluate rootless Docker or another restricted operational model before casually adding every lab user to the unrestricted Docker group.
+## 2. Clone this repository
 
-## 3. Clone BioGeMT-Pipelines
+Place the checkout in a stable location that all intended users can read and execute:
 
 ```bash
 git clone https://github.com/BioGeMT/BioGeMT-Pipelines.git
 cd BioGeMT-Pipelines
 ```
 
-## 4. Configure BioGeMT Paths
+Do not put the shared checkout in an administrator's private home directory if other users need to run it.
 
-Create the shared directory layout, using whatever ownership and permissions match the lab's security model:
+## 3. Prepare the shared reference-data directory
 
-```text
-/srv/biogemt/
-├── data/
-│   └── genomic-region-annotator/
-├── runs/
-│   └── genomic-region-annotator/
-├── cache/
-│   └── genomic-region-annotator/
-└── logs/
+The default shared-data path is `/srv/biogemt/data`. Create it and give intended users read access to the directory and its files. For example:
+
+```bash
+sudo mkdir -p /srv/biogemt/data/genomic-region-annotator
 ```
 
-Copy the example config and edit it if the server uses different paths:
+Use the server's normal group and permissions policy for reference files. The launcher mounts this directory read-only in containers. Put GTF files and other shared references there; users pass their paths with options such as `--gtf`.
+
+## 4. Configure paths (optional)
+
+The defaults are:
+
+```text
+BIOGEMT_ROOT=/srv/biogemt
+BIOGEMT_DATA=/srv/biogemt/data
+```
+
+If these paths suit the server, no config file is needed. Otherwise, create a local config and edit it:
 
 ```bash
 cp config/server.env.example config/server.env
 ```
 
-Default values are:
+Set `BIOGEMT_ROOT` to the shared BioGeMT directory. If `BIOGEMT_DATA` is omitted, it defaults to `$BIOGEMT_ROOT/data`. Set it explicitly when reference data is elsewhere. The file is sourced as a shell config, so keep it to trusted variable assignments. It is ignored by Git.
+
+## 5. Make the command available to users
+
+For a quick check from the checkout:
 
 ```bash
-BIOGEMT_ROOT=/srv/biogemt
-BIOGEMT_DATA=/srv/biogemt/data
-BIOGEMT_RUNS=/srv/biogemt/runs
+bin/biogemt list
 ```
 
-Reference datasets, including downloaded Ensembl GTF files, live under shared data paths outside Docker images.
-
-## 5. Put `biogemt` on PATH
-
-For one shell:
+To make `biogemt` available on every user's `PATH`, create a symlink in a shared command directory. Run this from the repository checkout:
 
 ```bash
-export PATH="$PWD/bin:$PATH"
+sudo ln -s "$(pwd)/bin/biogemt" /usr/local/bin/biogemt
 ```
 
-For all users, install or symlink `bin/biogemt` into a shared location that is already on `PATH`, such as `/usr/local/bin`, according to local administrator policy.
+The launcher resolves the repository location through the symlink, so it can find its pipeline scripts and default config.
 
-## 6. Pull and Test the Image
+## 6. Check image access and server setup
 
-```bash
-docker pull ghcr.io/biogemt/genomic-region-annotator:0.1.0
-docker run --rm ghcr.io/biogemt/genomic-region-annotator:0.1.0 --help
-```
-
-If `docker pull` reports `unauthorized`, the GHCR package is not publicly readable for anonymous pulls. Either make the package public in GitHub Packages, or authenticate Docker with an account/token that has package read access:
-
-```bash
-docker login ghcr.io
-```
-
-## 7. Run Doctor
+Run:
 
 ```bash
 biogemt doctor
 ```
 
-`doctor` checks Docker availability, Docker daemon access, configured shared paths, and whether the configured image is locally available or resolvable from GHCR. It does not modify the system.
+The doctor checks that Docker is installed and reachable, the configured paths are accessible, and the pipeline image is available locally or can be resolved from GHCR.
 
-## 8. Run a Small Test Annotation
-
-From a directory containing small test files:
+If the image is public, Docker can download it without login. If GHCR reports `unauthorized`, either make the package public or have each user authenticate with an account/token that has package read access:
 
 ```bash
-biogemt run genomic-region-annotator \
-  annotate \
-  --input input.tsv \
-  --gtf annotation.gtf \
-  --output results/output.tsv
+docker login ghcr.io
 ```
 
-Generated files are written through the mounted current directory and should be owned by the invoking host user.
+Resolve any `[FAIL]` messages before telling users the server is ready. A missing data directory is reported as a warning; create it if users need shared references.
+
+## 7. Hand off to users
+
+Tell users:
+
+- Run `biogemt doctor` if Docker or image access fails.
+- Work from a directory containing the input files and where they want output files. The launcher mounts that current directory read-write.
+- Store shared reference data under `BIOGEMT_DATA`; the launcher mounts it read-only.
+- Follow the [two-step annotation example](../README.md#run-an-annotation) to run `annotate` and then `summarize-sites`.

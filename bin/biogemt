@@ -1,19 +1,28 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SOURCE="${BASH_SOURCE[0]}"
+while [[ -h "${SOURCE}" ]]; do
+  SOURCE_DIR="$(cd -P "$(dirname "${SOURCE}")" >/dev/null 2>&1 && pwd)"
+  TARGET="$(readlink "${SOURCE}")"
+  if [[ "${TARGET}" == /* ]]; then
+    SOURCE="${TARGET}"
+  else
+    SOURCE="${SOURCE_DIR}/${TARGET}"
+  fi
+done
+ROOT_DIR="$(cd -P "$(dirname "${SOURCE}")/.." >/dev/null 2>&1 && pwd)"
 CONFIG_FILE="${BIOGEMT_CONFIG:-${ROOT_DIR}/config/server.env}"
-
-BIOGEMT_ROOT="${BIOGEMT_ROOT:-/srv/biogemt}"
-BIOGEMT_DATA="${BIOGEMT_DATA:-${BIOGEMT_ROOT}/data}"
-BIOGEMT_RUNS="${BIOGEMT_RUNS:-${BIOGEMT_ROOT}/runs}"
 
 if [[ -f "${CONFIG_FILE}" ]]; then
   # shellcheck source=/dev/null
   source "${CONFIG_FILE}"
 fi
 
-export BIOGEMT_ROOT BIOGEMT_DATA BIOGEMT_RUNS
+BIOGEMT_ROOT="${BIOGEMT_ROOT:-/srv/biogemt}"
+BIOGEMT_DATA="${BIOGEMT_DATA:-${BIOGEMT_ROOT}/data}"
+
+export BIOGEMT_ROOT BIOGEMT_DATA
 
 usage() {
   cat <<USAGE

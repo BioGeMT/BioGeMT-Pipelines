@@ -5,14 +5,13 @@ IMAGE="${BIOGEMT_GENOMIC_REGION_ANNOTATOR_IMAGE:-ghcr.io/biogemt/genomic-region-
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 CONFIG_FILE="${BIOGEMT_CONFIG:-${ROOT_DIR}/config/server.env}"
 
-BIOGEMT_ROOT="${BIOGEMT_ROOT:-/srv/biogemt}"
-BIOGEMT_DATA="${BIOGEMT_DATA:-${BIOGEMT_ROOT}/data}"
-BIOGEMT_RUNS="${BIOGEMT_RUNS:-${BIOGEMT_ROOT}/runs}"
-
 if [[ -f "${CONFIG_FILE}" ]]; then
   # shellcheck source=/dev/null
   source "${CONFIG_FILE}"
 fi
+
+BIOGEMT_ROOT="${BIOGEMT_ROOT:-/srv/biogemt}"
+BIOGEMT_DATA="${BIOGEMT_DATA:-${BIOGEMT_ROOT}/data}"
 
 if ! command -v docker >/dev/null 2>&1; then
   echo "Docker is required but was not found in PATH." >&2
