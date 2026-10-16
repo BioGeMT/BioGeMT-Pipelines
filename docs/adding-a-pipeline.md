@@ -8,7 +8,7 @@ For a future second pipeline, reassess the launcher shape before generalizing. U
 2. Publish a versioned Docker image for the pipeline.
 3. Add a directory under `pipelines/<pipeline-name>/`.
 4. Add a small `run.sh` that pins an explicit image version or digest.
-5. Add the pipeline name to `bin/biogemt list` and dispatch in `bin/biogemt run`.
+5. Add the pipeline name to `bin/BioPipelines list` and dispatch in `bin/BioPipelines run`.
 6. Document any required shared reference-data layout.
 7. Add an alphabetized row to the Available pipelines table in `README.md`, linking to the upstream repository's usage instructions.
 

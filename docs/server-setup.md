@@ -53,23 +53,24 @@ Set `BIOGEMT_ROOT` to the shared BioGeMT directory. If `BIOGEMT_DATA` is omitted
 For a quick check from the checkout:
 
 ```bash
-bin/biogemt list
+bin/BioPipelines list
 ```
 
-To make `biogemt` available on every user's `PATH`, create a symlink in a shared command directory. Run this from the repository checkout:
+To make `BioPipelines` available on every user's `PATH`, create a symlink in a shared command directory. Run this from the repository checkout:
 
 ```bash
-sudo ln -s "$(pwd)/bin/biogemt" /usr/local/bin/biogemt
+sudo ln -s "$(pwd)/bin/BioPipelines" /usr/local/bin/BioPipelines
 ```
 
 The launcher resolves the repository location through the symlink, so it can find its pipeline scripts and default config.
+If upgrading from the old `biogemt` command, replace its symlink with the one above. Command names are case-sensitive: users should run `BioPipelines`.
 
 ## 6. Check image access and server setup
 
 Run:
 
 ```bash
-biogemt doctor
+BioPipelines doctor
 ```
 
 The doctor checks that Docker is installed and reachable, the configured paths are accessible, and the pipeline image is available locally or can be resolved from GHCR.
@@ -86,7 +87,7 @@ Resolve any `[FAIL]` messages before telling users the server is ready. A missin
 
 Tell users:
 
-- Run `biogemt doctor` if Docker or image access fails.
+- Run `BioPipelines doctor` if Docker or image access fails.
 - Work from a directory containing the input files and where they want output files. The launcher mounts that current directory read-write.
 - Store shared reference data under `BIOGEMT_DATA`; the launcher mounts it read-only.
-- Follow the [two-step annotation example](../README.md#run-an-annotation) to run `annotate` and then `summarize-sites`.
+- Follow the [pipeline usage instructions](../README.md#how-to-run-a-pipeline) to find the upstream workflow and run it through `BioPipelines`.

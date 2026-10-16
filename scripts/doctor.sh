@@ -18,7 +18,7 @@ check_ok() { printf '[OK] %s\n' "$1"; }
 check_warn() { printf '[WARN] %s\n' "$1"; }
 check_fail() { printf '[FAIL] %s\n' "$1"; ok=false; }
 
-printf 'BioGeMT doctor\n'
+printf 'BioPipelines doctor\n'
 printf 'Root: %s\n' "${BIOGEMT_ROOT}"
 printf 'Data: %s\n' "${BIOGEMT_DATA}"
 printf 'Image: %s\n\n' "${IMAGE}"

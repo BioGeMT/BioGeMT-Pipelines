@@ -27,9 +27,9 @@ export BIOGEMT_ROOT BIOGEMT_DATA
 usage() {
   cat <<USAGE
 Usage:
-  biogemt list
-  biogemt run genomic-region-annotator [args...]
-  biogemt doctor
+  BioPipelines list
+  BioPipelines run genomic-region-annotator [args...]
+  BioPipelines doctor
 USAGE
 }
 
