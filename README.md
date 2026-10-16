@@ -22,7 +22,7 @@ or add this checkout's `bin/` directory to `PATH` for the current shell:
 export PATH="$PWD/bin:$PATH"
 ```
 
-Then list the pipelines available in your checkout:
+The list shows each pipeline's purpose and links to its upstream usage guide:
 
 ```bash
 BioPipelines list

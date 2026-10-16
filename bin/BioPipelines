@@ -36,7 +36,13 @@ USAGE
 command="${1:-}"
 case "${command}" in
   list)
-    echo "genomic-region-annotator"
+    printf 'Available pipelines:\n\n'
+    printf '  %-28s %s\n' \
+      'genomic-region-annotator' \
+      'Annotates genomic intervals using Ensembl GTF data.'
+    printf '    Usage: %s\n' \
+      'https://github.com/BioGeMT/genomic_region_annotator#usage'
+    printf '\nRun a pipeline with: BioPipelines run <name> <command> [options]\n'
     ;;
   run)
     pipeline="${2:-}"
