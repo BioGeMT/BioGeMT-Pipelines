@@ -10,7 +10,19 @@ The table lists pipelines wired into this launcher. Other BioGeMT repositories a
 | --- | --- | --- |
 | `genomic-region-annotator` | Annotates genomic intervals using Ensembl GTF data. | [Repository and usage](https://github.com/BioGeMT/genomic_region_annotator#usage) |
 
-On the server, list the pipelines available in your checkout with:
+If you are running from a checkout and `biogemt` is not on your `PATH`, either use the launcher path directly:
+
+```bash
+bin/biogemt list
+```
+
+or add this checkout's `bin/` directory to `PATH` for the current shell:
+
+```bash
+export PATH="$PWD/bin:$PATH"
+```
+
+Then list the pipelines available in your checkout:
 
 ```bash
 biogemt list
