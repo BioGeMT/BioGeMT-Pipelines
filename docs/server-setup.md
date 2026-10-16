@@ -15,8 +15,8 @@ Choose the server's Docker security model before granting access. Membership in 
 Place the checkout in a stable location that all intended users can read and execute:
 
 ```bash
-git clone https://github.com/BioGeMT/BioGeMT-Pipelines.git
-cd BioGeMT-Pipelines
+git clone https://github.com/BioGeMT/BioPipelines.git
+cd BioPipelines
 ```
 
 Do not put the shared checkout in an administrator's private home directory if other users need to run it.
